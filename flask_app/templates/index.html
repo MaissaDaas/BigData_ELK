@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='csvjson-img.png') }}" type="image/x-icon">
+    <title>Upload de Fichiers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="upload">
+        <img src="{{ url_for('static', filename='csvjson-img.png') }}" alt="">
+        <h1>Uploader des fichiers JSON ou CSV</h1>
+
+        {% if error_message %}
+        <div class="error-message">
+            <p>{{ error_message }}</p>
+        </div>
+        {% endif %}
+
+        <form action="/upload" method="post" enctype="multipart/form-data" class="">
+            <label for="file">Choisissez un fichier :</label>
+            <input type="file" name="file" id="file" required>
+            <button type="submit">Télécharger</button>
+        </form>
+    </div>
+</body>
+
+</html>
