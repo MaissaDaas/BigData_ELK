@@ -2,16 +2,21 @@ from flask import Flask, render_template, request, redirect, url_for
 import os
 import json
 import csv
+import requests 
+# import requests  # Don't forget to import requests
 
 app = Flask(__name__)
 
 LOGS_DIR = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..', 'logstash', 'logs')
 
-# Vérifier que le dossier 'logs' existe
 if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
 
+# Define Kibana URL and visualization ID
+KIBANA_URL = "https://organic-barnacle-v7447rjg7rwcpr9w-5601.app.github.dev"
+#/  # URL complète de votre instance Kibana
+VISUALIZATION_ID = "a2cbb630-b0ea-11ef-bffc-c7786914d8da"
 
 @app.route('/')
 def index():
@@ -33,7 +38,6 @@ def upload_file():
         filename = os.path.join(LOGS_DIR, file.filename)
         file.save(filename)
 
-        # Vérifier Si le fichier est un JSON ou CSV
         try:
             if filename.endswith('.json'):
                 process_json(filename)
@@ -46,29 +50,16 @@ def upload_file():
 
     return redirect(url_for('index', error_message="Fichier non autorisé, uniquement JSON ou CSV."))
 
-# Vérifier si le fichier est un JSON ou un CSV
+@app.route('/dashboard')
+def show_visualization():
+    return render_template('dashboard.html')
 
-
-def allowed_file(filename):
-    return filename.endswith('.json') or filename.endswith('.csv')
-
-# Traiter le fichier JSON
-
-
-def process_json(filename):
-    with open(filename, 'r') as file:
-        data = json.load(file)
-        print(f"Fichier JSON traité: {filename}")
-
-# Traiter le fichier CSV
-
-
-def process_csv(filename):
-    with open(filename, 'r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            print(f"Ligne CSV: {row}")
-
+@app.route('/search')
+def show_search():
+    return render_template('search.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
