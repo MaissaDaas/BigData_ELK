@@ -2,10 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for
 import os
 import json
 import csv
-import requests 
+import requests
+from elasticsearch import Elasticsearch
+
 # import requests  # Don't forget to import requests
 
 app = Flask(__name__)
+
+es = Elasticsearch(["http://localhost:9200"])
 
 LOGS_DIR = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..', 'logstash', 'logs')
@@ -15,8 +19,9 @@ if not os.path.exists(LOGS_DIR):
 
 # Define Kibana URL and visualization ID
 KIBANA_URL = "https://organic-barnacle-v7447rjg7rwcpr9w-5601.app.github.dev"
-#/  # URL complète de votre instance Kibana
+# /  # URL complète de votre instance Kibana
 VISUALIZATION_ID = "a2cbb630-b0ea-11ef-bffc-c7786914d8da"
+
 
 @app.route('/')
 def index():
@@ -50,16 +55,37 @@ def upload_file():
 
     return redirect(url_for('index', error_message="Fichier non autorisé, uniquement JSON ou CSV."))
 
+
 @app.route('/dashboard')
 def show_visualization():
     return render_template('dashboard.html')
 
-@app.route('/search')
-def show_search():
-    return render_template('search.html')
+
+@app.route('/search', methods=['GET', 'POST'])
+def search_logs():
+    results = []
+    query = ""
+    if request.method == 'POST':
+        query = request.form.get('query')
+        if query:
+            # Elasticsearch search query
+            es_query = {
+                "query": {
+                    "multi_match": {
+                        "query": query,
+                        "fields": ["LineId", "Label", "Timestamp", "Date", "User", "Month", "Day", "Time", "Location", "Component", "PID", "Content", "EventId", "EventTemplate"]
+                    }
+                }
+            }
+            response = es.search(index="csv-2024.12.02", body=es_query)
+            results = response.get('hits', {}).get('hits', [])
+
+            # Remove duplicates based on 'LineId'
+            results = {result['_source']['LineId']
+                : result for result in results}.values()
+
+    return render_template('search.html', results=results, query=query)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-

@@ -23,7 +23,54 @@
             <h1> <i class="fas fa-search"></i> Search</h1>
         </div>
 
+        <div class="search-box">
+            <form method="POST" class="search-input">
+                <input type="text" name="query" placeholder="Entrez votre recherche..." value="{{ query }}">
+                <button type="submit">Rechercher</button>
+            </form>
 
+            <table>
+                <thead>
+                    <tr>
+                        <th>Line Id</th>
+                        <th>Label</th>
+                        <th>Timestamp</th>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>Month</th>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Location</th>
+                        <th>Component</th>
+                        <th>PID</th>
+                        <th>Content</th>
+                        <th>Event Id</th>
+                        <th>Event Template</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result['_source']['LineId'] }}</td>
+                        <td>{{ result['_source']['Label'] }}</td>
+                        <td>{{ result['_source']['Timestamp'] }}</td>
+                        <td>{{ result['_source']['Date'] }}</td>
+                        <td>{{ result['_source']['User'] }}</td>
+                        <td>{{ result['_source']['Month'] }}</td>
+                        <td>{{ result['_source']['Day'] }}</td>
+                        <td>{{ result['_source']['Time'] }}</td>
+                        <td>{{ result['_source']['Location'] }}</td>
+                        <td>{{ result['_source']['Component'] }}</td>
+                        <td>{{ result['_source']['PID'] }}</td>
+                        <td>{{ result['_source']['Content'] }}</td>
+                        <td>{{ result['_source']['EventId'] }}</td>
+                        <td>{{ result['_source']['EventTemplate'] }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 

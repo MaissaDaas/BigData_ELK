@@ -19,6 +19,16 @@ body {
     padding-top: 1rem;
 }
 
+.search-box {
+    background-color: #fff;
+    padding: 2.5rem;
+    border-radius: 2rem;
+    box-shadow: 0 2rem 3rem rgba(132, 139, 200, 0.18);
+    transition: all .3s ease;
+    width: 100%;
+    padding-top: 1rem;
+}
+
 h1 {
     font-weight: 800;
     font-size: 1.9rem;
@@ -149,4 +159,107 @@ button:hover {
 
 iframe {
     border: none;
+}
+
+.search-input {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 60%;
+}
+
+.search-input input[type="text"] {
+    flex: 1;
+    width: 13rem;
+    padding: .8rem 1rem;
+    font-size: .9rem;
+    border: 2px solid #ccc;
+    border-radius: 1rem;
+    color: #7d8da1;
+    transition: all 0.3s ease;
+}
+
+.search-input button {
+    color: white;
+    background-color: #f9943b;
+    width: 7rem;
+    padding: .8rem 1rem;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+    font-size: .9rem;
+    font-weight: 550;
+    transition: background-color 0.3s;
+}
+
+.search-input button:hover {
+    background-color: #77c92a;
+}
+
+.search-input input[type="text"]:focus {
+    border-color: #77c92a;
+    outline: none;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    padding: 1.8rem;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    color: #363949;
+    padding: 0rem;
+    margin-top: 2rem;
+    background-color: #fff;
+}
+
+table:hover {
+    box-shadow: none;
+}
+
+table tbody td {
+    height: 4rem;
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    color: #677483;
+    font-size: .9rem;
+    border-radius: 1rem;
+}
+
+table thead {
+    width: 100;
+}
+
+table th {
+    padding: 0.9rem;
+    text-align: center;
+    border-bottom: 1px solid #fff;
+    background-color: #f6f6f9;
+    color: #363949;
+    font-weight: bold;
+    font-size: .9rem;
+}
+
+table tr {
+    padding: 0.8rem;
+    text-align: center;
+    border-bottom: 1px solid #fff;
+    border-bottom-left-radius: 2rem;
+}
+
+table td {
+    padding: 0.8rem;
+    text-align: center;
+    border-bottom: 1px solid #dce1eb;
+}
+
+table tbody td:last-child {
+    border-right: none;
 }
