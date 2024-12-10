@@ -9,18 +9,118 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .primary {
+            display: inline-flex;
+            align-items: center;
+            position: relative; 
+            background-color: white;
+            border-bottom: 1px solid #fff;
+            color: #677483;
+            font-size: 1rem;
+            padding-bottom: 0;
+        }
 
+        .popup {
+            display: none;
+            width: 180px;
+            position: absolute;
+            align-items: center; 
+            top: 2rem; 
+            left: 0rem;
+            right: 0;
+            background-color: white;
+            border: 1px solid white;
+            box-shadow: 0 2px 8px #677483;
+            border-radius: 6px;
+            transform: translateY(5px);
+            opacity: 0;
+            visibility: hidden;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .popup.active {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+            cursor: pointer;
+        }
+
+        .popup span {
+            display: block;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        .popup span:hover {
+            background-color: #f6f6f9;
+        }
+
+        .action-icons {
+            border-radius: 2rem;
+            padding: 0;
+            margin: 0;
+            padding-left: 1.2rem;
+            width: auto;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            gap: 0.3rem;
+            align-items: center;
+            color: #363949;
+            font-size: .8rem;
+        }
+    </style>
 </head>
 
 <body>
     <div class="upload">
         <div class="icon-container">
-            <a href="/search" title="Search">
-                <i class="fas fa-search"></i>
-            </a>
-            <a href="/dashboard" title="Dashboard">
-                <i class="fas fa-layer-group"></i>
-            </a>
+            <div class="primary">
+                <i class="fas fa-search" id="searchIcon" style="color: #363949;"></i>
+                <div class="popup" id="popup">
+                    <div class="action-icons">
+                        <a  href="/search" id="openModal" > 
+                            <h3>
+                                <i class="fas fa-file-csv" style="padding-right: .7rem; font-size: 1.1rem;"></i> 
+                                Search CSV
+                            </h3>
+                        </a>
+                    </div>
+
+                    <div class="action-icons">
+                        <a href="/searchjson" id="openModal">
+                            <h3>
+                                <i class="fas fa-code" style="padding-right: .7rem; font-size: 1.1rem;"></i> 
+                                Search JSON
+                            </h3>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="primary">
+                <i class="fas fa-layer-group" id="dashboardIcon" style="color: #363949;"></i>
+                <div class="popup" id="popupd" >
+                    <div class="action-icons">
+                        <a href="/dashboard" id="openModal" > 
+                            <h3>
+                                <i class="fas fa-layer-group" style="padding-right: .7rem; font-size: 1.1rem;"></i> 
+                                Dashboard CSV
+                            </h3>
+                        </a>
+                    </div>
+
+                    <div class="action-icons">
+                        <a href="/dashboardjson" id="openModal">
+                            <h3>
+                                <i class="fas fa-layer-group" style="padding-right: .7rem; font-size: 1.1rem;"></i> 
+                                Dashboard JSON
+                            </h3>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <img src="{{ url_for('static', filename='csvjson-img.png') }}" alt="">
@@ -38,6 +138,25 @@
             <button type="submit">Télécharger</button>
         </form>
     </div>
+
+    <script>
+        // Get the search icon and popup elements
+        const searchIcon = document.getElementById('searchIcon');
+        const popup = document.getElementById('popup');
+
+        // Toggle the popup visibility when the search icon is clicked
+        searchIcon.addEventListener('click', () => {
+            popup.classList.toggle('active');
+        });
+
+        const dashboardIcon = document.getElementById('dashboardIcon');
+        const popupd = document.getElementById('popupd');
+
+        // Toggle the popup visibility when the search icon is clicked
+        dashboardIcon.addEventListener('click', () => {
+            popupd.classList.toggle('active');
+        });
+    </script>
 </body>
 
 </html>

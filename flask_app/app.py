@@ -5,8 +5,6 @@ import csv
 import requests
 from elasticsearch import Elasticsearch
 
-# import requests  # Don't forget to import requests
-
 app = Flask(__name__)
 
 es = Elasticsearch(["http://localhost:9200"])
@@ -18,8 +16,7 @@ if not os.path.exists(LOGS_DIR):
     os.makedirs(LOGS_DIR)
 
 # Define Kibana URL and visualization ID
-KIBANA_URL = "https://organic-barnacle-v7447rjg7rwcpr9w-5601.app.github.dev"
-# /  # URL complète de votre instance Kibana
+KIBANA_URL = "https://5601-cs-22d925ca-5e97-409d-804f-4cd080d6f287.cs-europe-west1-haha.cloudshell.dev/"
 VISUALIZATION_ID = "a2cbb630-b0ea-11ef-bffc-c7786914d8da"
 
 
@@ -28,6 +25,23 @@ def index():
     error_message = request.args.get('error_message')
     return render_template('index.html', error_message=error_message)
 
+ALLOWED_EXTENSIONS = {'json', 'csv'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Traiter le fichier JSON
+def process_json(filename):
+    with open(filename, 'r') as file:
+        data = json.load(file)
+        print(f"Fichier JSON traité: {filename}")
+
+# Traiter le fichier CSV
+def process_csv(filename):
+    with open(filename, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            print(f"Ligne CSV: {row}")
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -40,8 +54,18 @@ def upload_file():
         return redirect(url_for('index', error_message="Aucun fichier sélectionné"))
 
     if file and allowed_file(file.filename):
-        filename = os.path.join(LOGS_DIR, file.filename)
-        file.save(filename)
+        # Déterminer le dossier cible en fonction de l'extension
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
+        subfolder = 'csv' if file_extension == 'csv' else 'json'
+        target_dir = os.path.join(LOGS_DIR, subfolder)
+
+        # Créer le dossier cible s'il n'existe pas
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+
+        # Enregistrer le fichier dans le sous-dossier approprié
+        file_path = os.path.join(target_dir, file.filename)
+        file.save(file_path)
 
         try:
             if filename.endswith('.json'):
@@ -49,17 +73,19 @@ def upload_file():
             elif filename.endswith('.csv'):
                 process_csv(filename)
         except Exception as e:
-            return redirect(url_for('index', error_message=f"Erreur lors du traitement du fichier: {str(e)}"))
+            return redirect(url_for('index'))
 
         return redirect(url_for('index'))
 
     return redirect(url_for('index', error_message="Fichier non autorisé, uniquement JSON ou CSV."))
 
-
 @app.route('/dashboard')
 def show_visualization():
     return render_template('dashboard.html')
 
+@app.route('/dashboardjson')
+def show_visualizationjson():
+    return render_template('dashboardjson.html')
 
 @app.route('/search', methods=['GET', 'POST'])
 def search_logs():
@@ -77,7 +103,7 @@ def search_logs():
                     }
                 }
             }
-            response = es.search(index="csv-2024.12.02", body=es_query)
+            response = es.search(index="csvmyindex-2024.12.10", body=es_query)
             results = response.get('hits', {}).get('hits', [])
 
             # Remove duplicates based on 'LineId'
@@ -85,6 +111,39 @@ def search_logs():
                 : result for result in results}.values()
 
     return render_template('search.html', results=results, query=query)
+
+import re
+
+@app.route('/searchjson', methods=['GET', 'POST'])
+def search_logs_json():
+    results = []
+    query = ""
+    if request.method == 'POST':
+        query = request.form.get('query')
+        if query:
+            # Échapper les caractères spéciaux
+            query = re.escape(query)
+            
+            # Elasticsearch search query
+            es_query = {
+                "query": {
+                    "multi_match": {
+                        "query": query,
+                        "fields": ["lineid", "timestamp", "EventTemplate", "eventid"]
+                    }
+                }
+            }
+            try:
+                response = es.search(index="jsonmyindex-2024.12.10", body=es_query)
+                results = response.get('hits', {}).get('hits', [])
+
+                # Supprimer les doublons basés sur 'LineId'
+                results = {result['_source']['LineId']: result for result in results}.values()
+            except Exception as e:
+                # Log the error or handle it accordingly
+                print(f"Error: {str(e)}")
+
+    return render_template('searchjson.html', results=results, query=query)
 
 
 if __name__ == '__main__':
