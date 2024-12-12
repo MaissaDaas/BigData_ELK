@@ -103,7 +103,7 @@ def search_logs():
                     }
                 }
             }
-            response = es.search(index="csvmyindex-2024.12.10", body=es_query)
+            response = es.search(index="csvmyindex-2024.12.12", body=es_query)
             results = response.get('hits', {}).get('hits', [])
 
             # Remove duplicates based on 'LineId'
@@ -113,37 +113,70 @@ def search_logs():
     return render_template('search.html', results=results, query=query)
 
 import re
-
 @app.route('/searchjson', methods=['GET', 'POST'])
 def search_logs_json():
     results = []
-    query = ""
+    queryj = ""
     if request.method == 'POST':
-        query = request.form.get('query')
-        if query:
-            # Échapper les caractères spéciaux
-            query = re.escape(query)
-            
-            # Elasticsearch search query
-            es_query = {
+        queryj = request.form.get('queryj')
+        if queryj:
+            es_queryj = {
                 "query": {
                     "multi_match": {
-                        "query": query,
-                        "fields": ["lineid", "timestamp", "EventTemplate", "eventid"]
+                        "query": queryj,
+                        "fields": ["lineid", "timestamp", "EventTemplate", "eventid"],
+                        "type": "best_fields"
                     }
                 }
             }
             try:
-                response = es.search(index="jsonmyindex-2024.12.10", body=es_query)
+                response = es.search(index="jsonmyindex-2024.12.12", body=es_queryj)
                 results = response.get('hits', {}).get('hits', [])
 
-                # Supprimer les doublons basés sur 'LineId'
-                results = {result['_source']['LineId']: result for result in results}.values()
-            except Exception as e:
-                # Log the error or handle it accordingly
-                print(f"Error: {str(e)}")
+                # Remove duplicates based on 'lineid'
+                unique_results = {}
+                for result in results:
+                    source = result.get('_source', {})
+                    if 'lineid' in source:
+                        unique_results[source['lineid']] = source
 
-    return render_template('searchjson.html', results=results, query=query)
+
+                results = unique_results.values()
+            except Exception as e:
+                print(f"Error while searching: {e}")
+
+    return render_template('searchjson.html', results=results, queryj=queryj)
+
+# @app.route('/searchjson', methods=['GET', 'POST'])
+# def search_logs_json():
+#     results = []
+#     query = ""
+#     if request.method == 'POST':
+#         query = request.form.get('query')
+#         if query:
+#             # Échapper les caractères spéciaux
+#             query = re.escape(query)
+            
+#             # Elasticsearch search query
+#             es_query = {
+#                 "query": {
+#                     "multi_match": {
+#                         "query": query,
+#                         "fields": ["lineid", "timestamp", "EventTemplate", "eventid"]
+#                     }
+#                 }
+#             }
+#             try:
+#                 response = es.search(index="jsonmyindex-2024.12.12", body=es_query)
+#                 results = response.get('hits', {}).get('hits', [])
+
+#                 # Supprimer les doublons basés sur 'LineId'
+#                 results = {result['_source']['LineId']: result for result in results}.values()
+#             except Exception as e:
+#                 # Log the error or handle it accordingly
+#                 print(f"Error: {str(e)}")
+
+#     return render_template('searchjson.html', results=results, query=query)
 
 
 if __name__ == '__main__':

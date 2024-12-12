@@ -25,7 +25,7 @@
 
         <div class="search-box">
             <form method="POST" class="search-input">
-                <input type="text" name="query" placeholder="Entrez votre recherche..." value="{{ query }}">
+                <input type="text" name="queryj" placeholder="Entrez votre recherche..." value="{{ queryj }}">
                 <button type="submit">Rechercher</button>
             </form>
 
@@ -39,14 +39,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for result in results %}
-                    <tr>
-                        <td>{{ result['_source']['lineid'] }}</td>
-                        <td>{{ result['_source']['timestamp'] }}</td>
-                        <td>{{ result['_source']['EventTemplate'] }}</td>
-                        <td>{{ result['_source']['eventid'] }}</td>
-                    </tr>
-                    {% endfor %}
+                    <!-- {% if results %} -->
+                        {% for result in results %}
+                            <tr>
+                                <td>{{ result.lineid }}</td>
+                                <td>{{ result.timestamp }}</td>
+                                <td>{{ result.EventTemplate }}</td>
+                                <td>{{ result.eventid }}</td>
+                            </tr>
+                        {% endfor %}
+                    <!-- {% else %}
+                        <tr>
+                            <td colspan="4">Aucun résultat trouvé pour "{{ queryj }}".</td>
+                        </tr>
+                    {% endif %} -->
+
                 </tbody>
             </table>
         </div>
